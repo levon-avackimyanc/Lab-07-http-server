@@ -37,22 +37,15 @@ find_package(GTest CONFIG REQUIRED)
 hunter_add_package(nlohmann_json)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-add_library(${PROJECT_NAME} STATIC
-        # enum your files and delete this comment
-        ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
-        )
-
 add_executable(tests
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
+        #${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/InputJson.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/JsonSuggestions.cpp
         )
 
 target_include_directories(tests
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-        )
-
-target_include_directories(${PROJECT_NAME} PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-        "$<INSTALL_INTERFACE:include>"
         )
 
 target_link_libraries(tests
@@ -63,16 +56,8 @@ target_link_libraries(tests
         nlohmann_json::nlohmann_json
         )
 
-target_link_libraries(tests ${PROJECT_NAME})
-
-#if(BUILD_TESTS)
- # add_executable(tests
-  #        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
-   #       )
-  #target_link_libraries(tests ${PROJECT_NAME} GTest::gtest_main)
-  #enable_testing()
-  #add_test(NAME unit_tests COMMAND tests)
-#endif()
+enable_testing()
+add_test(NAME unit_tests COMMAND tests)
 
 if(BUILD_COVERAGE)
  set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
