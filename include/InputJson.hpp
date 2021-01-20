@@ -8,13 +8,18 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
- class Input_Json{
- public:
-     explicit Input_Json(const std::string& filename);
-     json GetJson() const;
-     void Upload();
- private:
-     std::string Filename;
-     json J;
- };
+
+class Input_Json {
+public:
+    explicit Input_Json(const std::string &filename);
+
+    json GetJson() const;
+
+    void Upload();
+
+private:
+    std::string Filename;
+    json J;
+};
+
 #endif // INCLUDE_SERVER_INPUTJSON_HPP

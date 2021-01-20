@@ -18,7 +18,7 @@ namespace beast = boost::beast;    // from <boost/beast.hpp>
 namespace http = beast::http;      // from <boost/beast/http.hpp>
 namespace net = boost::asio;       // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
-std::string JSONtoString(const json& data) {
+std::string JSONtoString(const json &data) {
     std::stringstream ss;
     if (data.is_null())
         ss << "No suggestions";
@@ -28,10 +28,10 @@ std::string JSONtoString(const json& data) {
 }
 
 
-template <class Body, class Allocator, class Send>
-void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req,
-                    Send&& send, const std::shared_ptr<std::timed_mutex>& mutex,
-                    const std::shared_ptr<Json_Suggestions>& collection) {
+template<class Body, class Allocator, class Send>
+void handle_request(http::request<Body, http::basic_fields<Allocator>> &&req,
+                    Send &&send, const std::shared_ptr<std::timed_mutex> &mutex,
+                    const std::shared_ptr<Json_Suggestions> &collection) {
 
     auto const bad_request = [&req](beast::string_view why) {
         http::response<http::string_body> res{http::status::bad_request,
@@ -72,13 +72,13 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req,
     json input_body;
     try {
         input_body = json::parse(req.body());
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         return send(bad_request(e.what()));
     }
     boost::optional<std::string> input;
     try {
         input = input_body.at("input").get<std::string>();
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         return send(bad_request(R"(JSON format: {"input": "<user_input>"}!)"));
     }
     if (!input.has_value()) {
@@ -111,22 +111,22 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req,
     return send(std::move(res));
 }
 
-void fail(beast::error_code ec, char const* what) {
+void fail(beast::error_code ec, char const *what) {
     std::cerr << what << ": " << ec.message() << "\n";
 }
 
 
-template <class Stream>
+template<class Stream>
 struct send_lambda {
-    Stream& stream_;
-    [[maybe_unused]] bool& close_;
-    beast::error_code& ec_;
+    Stream &stream_;
+    [[maybe_unused]] bool &close_;
+    beast::error_code &ec_;
 
-    explicit send_lambda(Stream& stream, bool& close, beast::error_code& ec)
+    explicit send_lambda(Stream &stream, bool &close, beast::error_code &ec)
             : stream_(stream), close_(close), ec_(ec) {}
 
-    template <bool isRequest, class Body, class Fields>
-    void operator()(http::message<isRequest, Body, Fields>&& msg) const {
+    template<bool isRequest, class Body, class Fields>
+    void operator()(http::message<isRequest, Body, Fields> &&msg) const {
         close_ = msg.need_eof();
 
 
@@ -136,9 +136,9 @@ struct send_lambda {
 };
 
 
-void do_session(net::ip::tcp::socket& socket,
-                const std::shared_ptr<Json_Suggestions>& collection,
-                const std::shared_ptr<std::timed_mutex>& mutex) {
+void do_session(net::ip::tcp::socket &socket,
+                const std::shared_ptr<Json_Suggestions> &collection,
+                const std::shared_ptr<std::timed_mutex> &mutex) {
     bool close = false;
     beast::error_code ec;
 
@@ -159,10 +159,10 @@ void do_session(net::ip::tcp::socket& socket,
 }
 
 void suggestion_updater(
-        const std::shared_ptr<Input_Json>& storage,
-        const std::shared_ptr<Json_Suggestions>& suggestions,
-        const std::shared_ptr<std::timed_mutex>& mutex) {
-    using std::chrono_literals::operator""min;
+        const std::shared_ptr<Input_Json> &storage,
+        const std::shared_ptr<Json_Suggestions> &suggestions,
+        const std::shared_ptr<std::timed_mutex> &mutex) {
+    using std::chrono_literals::operator ""min;
     for (;;) {
         // WRITE - блокировка
         mutex->lock();
@@ -173,7 +173,8 @@ void suggestion_updater(
         std::this_thread::sleep_for(15min);
     }
 }
-int Run_server(int argc, char* argv[]) {
+
+int Run_server(int argc, char *argv[]) {
     std::shared_ptr<std::timed_mutex> mutex =
             std::make_shared<std::timed_mutex>();
     std::shared_ptr<Input_Json> storage = std::make_shared<Input_Json>(
@@ -203,13 +204,13 @@ int Run_server(int argc, char* argv[]) {
             std::thread{std::bind(&do_session, std::move(socket), suggestions, mutex)}
                     .detach();
         }
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         std::cerr << e.what() << '\n';
         return EXIT_FAILURE;
     }
 }
 
 // Using: ./cmake-build-debug/tests 0.0.0.0 8080
-int main(int argc, char* argv[]) {
+/*int main(int argc, char* argv[]) {
     return Run_server(argc, argv);
-}
+}*/
