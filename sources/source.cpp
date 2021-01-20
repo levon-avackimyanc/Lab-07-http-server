@@ -119,7 +119,7 @@ void fail(beast::error_code ec, char const *what) {
 template<class Stream>
 struct send_lambda {
     Stream &stream_;
-    [[maybe_unused]] bool &close_;
+    bool &close_;
     beast::error_code &ec_;
 
     explicit send_lambda(Stream &stream, bool &close, beast::error_code &ec)
