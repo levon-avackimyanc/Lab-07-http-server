@@ -3,5 +3,5 @@
 #include <gtest/gtest.h>
 
 TEST(Example, EmptyTest) {
-     SUCCEED();
+     EXPECT_TRUE(true);
 }

@@ -10,7 +10,6 @@ void Json_Suggestions::SuggestUpdate(json J) {
     std::sort(J.begin(), J.end(), Compare);
     Suggestions = J;
 }
-
 json Json_Suggestions::Suggest(const std::string &In) {
     json res;
     size_t m_pos = 0;
@@ -18,9 +17,10 @@ json Json_Suggestions::Suggest(const std::string &In) {
         if(In==Suggestions[i].at("id")){
             json buff;
             buff["text"] = Suggestions[i].at("name");
-            buff["position"] = m_pos;
-            buff["suggestions"].push_back(buff);
+            buff["position"] = m_pos++;
+            res["suggestions"].push_back(buff);
         }
     }
     return res;
 }
+
